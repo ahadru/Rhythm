@@ -1,9 +1,12 @@
 package com.ahad.rhythm;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -78,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
         }
         ArrayAdapter<String> myAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,items);
         myListViewForSongs.setAdapter(myAdapter);
+
+        myListViewForSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String songName = myListViewForSongs.getItemAtPosition(position).toString();
+                startActivity(new Intent(getApplicationContext(),PlayerActivity.class)
+                        .putExtra("songs",mySongs).putExtra("songname",songName));
+            }
+        });
     }
 
 }
