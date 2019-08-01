@@ -1,10 +1,13 @@
 package com.ahad.rhythm;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -25,6 +28,7 @@ public class PlayerActivity extends AppCompatActivity {
     Thread updateSeekBar;
     String sname;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +38,10 @@ public class PlayerActivity extends AppCompatActivity {
         btn_previous = (Button)findViewById(R.id.previous);
         songTextLabel = (TextView)findViewById(R.id.songLabel);
         songSeekBar = (SeekBar)findViewById(R.id.seek_bar);
+
+        getSupportActionBar().setTitle("Now Playing");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         updateSeekBar = new Thread(){
             @Override
@@ -71,6 +79,11 @@ public class PlayerActivity extends AppCompatActivity {
         myMediaPlayer = MediaPlayer.create(getApplicationContext(),u);
         myMediaPlayer.start();
         songSeekBar.setMax(myMediaPlayer.getDuration());
+
+        updateSeekBar.start();
+        songSeekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+        songSeekBar.getThumb().setColorFilter(getResources().getColor(R.color.colorPrimary),PorterDuff.Mode.SRC_IN);
+
 
         songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -131,5 +144,16 @@ public class PlayerActivity extends AppCompatActivity {
                 myMediaPlayer.start();
             }
         });
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == android.R.id.home){
+            onBackPressed();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
