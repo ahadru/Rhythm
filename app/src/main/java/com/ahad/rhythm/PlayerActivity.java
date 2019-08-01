@@ -1,6 +1,8 @@
 package com.ahad.rhythm;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -20,6 +22,7 @@ public class PlayerActivity extends AppCompatActivity {
     int position;
     ArrayList<File> mySongs;
     Thread updateSeekBar;
+    String sname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,53 @@ public class PlayerActivity extends AppCompatActivity {
             public void run() {
                 int total_duration = myMediaPlayer.getDuration();
                 int currentPosition = 0;
+                while(currentPosition < total_duration){
+                    try{
+                        sleep(500);
+                        currentPosition  = myMediaPlayer.getCurrentPosition();
+                        songSeekBar.setProgress(currentPosition);
+
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
             }
         };
+
+        if(myMediaPlayer != null){
+            myMediaPlayer.stop();
+            myMediaPlayer.release();
+        }
+        Intent i = getIntent();
+        Bundle bundle = i.getExtras();
+
+        mySongs = (ArrayList) bundle.getParcelableArrayList("songs");
+        sname = mySongs.get(position).getName().toString();
+        String songName = i.getStringExtra("songname");
+        songTextLabel.setText(songName);
+        songTextLabel.setSelected(true);
+
+        position = bundle.getInt("pos",0);
+        Uri u  = Uri.parse(mySongs.get(position).toString());
+        myMediaPlayer = MediaPlayer.create(getApplicationContext(),u);
+        myMediaPlayer.start();
+        songSeekBar.setMax(myMediaPlayer.getDuration());
+
+        songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                myMediaPlayer.seekTo((seekBar.getProgress()));
+            }
+        });
     }
 }
